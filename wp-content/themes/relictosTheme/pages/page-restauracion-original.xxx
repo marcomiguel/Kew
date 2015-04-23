@@ -1,0 +1,165 @@
+<?php
+/*
+Template Name: Restauracion
+*/
+?>
+
+<?php get_header(); ?>
+			
+	<div id="restauracion">
+
+		<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+		
+		<section id="restauracion-main">	
+			
+			<div class="row">
+				
+				<div class="three columns sidebar-submenu">
+
+					<div id="accordion">
+						<?php 
+							$parent = 1111;
+							$args = array(
+							  'child_of' => $parent,
+							  'title_li'     => __('')
+							);
+							wp_list_pages($args);								
+						?>								
+					</div>
+
+				</div>
+				
+				<div class="nine columns container" id="restauracion-info">
+			
+					<div class="row container-title">
+						
+						<h1 class="title-page"><?php the_title(); ?></h1>					
+					</div><!-- restauracion h1 titulo -->
+			
+					<div class="row">
+				
+						<div class="twelve columns">
+				
+						    <?php 
+								$galeria = get_post_meta($post->ID, "cf_galeria", true);
+						    ?>
+						
+							<?php if ($galeria != ""){ ?>
+								<section class="slider">
+									<div id="slider" class="flexslider">										
+										<?php echo do_shortcode( $galeria ); ?>
+									</div>
+									<div id="carousel" class="flexslider">										
+										<?php echo do_shortcode( $galeria ); ?>
+									</div>
+								</section>
+							<?php } ?>
+							
+						</div>
+
+					</div>
+			
+					<div class="row">
+
+						<?php the_content(); ?>
+					</div>
+
+					<section id="documentos-grid">
+													
+						<?php			
+
+							global $post;
+							$slug = get_post( $post )->post_name;									
+							
+							$documentos_args = array(
+								'post_type'			=> 'documento',
+								'posts_per_page'	=> -1,
+								'tax_query' => array(
+									array(
+										'taxonomy' => 'tipo-de-documento',
+										'field' => 'slug',
+										'terms' => $slug,
+									)
+								)
+							);	
+																	
+							$documentos_query = new WP_Query($documentos_args);
+						?>
+
+						<?php $count = $documentos_query->post_count; ?>
+
+						<?php if ( $count>=1) { ?>
+						
+						<div class="row">
+					
+							<div class="twelve columns">
+
+								<h3>Documentos</h3>
+						
+								<ul class="block-grid one-up mobile-one-up">
+							
+									<?php while ( $documentos_query->have_posts() ) : $documentos_query->the_post(); ?>
+								
+									<li class="grid-item">
+											
+										<?php 
+											global $post;
+											$documento = get_post_meta($post->ID, "documento", true);
+										?>
+									
+										<a href="<?php echo $url; ?>" <?php if ($destino == "externo"){ echo "target=\"_blank\""; } ?>>
+
+											<div class="two columns">
+										
+												<div class="image-block">
+													<?php if ( has_post_thumbnail() ) { ?>
+														<?php the_post_thumbnail('thumbnail'); ?>
+													<?php } else { ?>
+														<img src="http://placehold.it/150x150/504437/756963/&text=+[foto]" alt="<?php the_title(); ?>" />
+													<?php } ?>
+												</div>
+
+											</div><!-- two columns Icono -->
+
+											<div class="ten columns">
+											
+												<div class="titulo-block">
+													<h4><?php the_title(); ?></h4>
+												</div>
+												
+												<div class="resumen-block">
+													<p><?php the_excerpt(); ?></p>
+												</div>
+												
+											</div><!-- ten columns excerpt -->
+													
+										</a>
+										
+									</li>
+									
+									<?php endwhile; ?>
+									<?php wp_reset_postdata();  ?>
+								
+								</ul><!-- .block-grid -->
+							
+							</div>
+							
+						</div>
+
+						<?php } ?>
+					
+					</section>
+				    			
+				</div><!-- restauracion-content -->
+			
+			</div>
+			
+		</section>
+					
+		<?php endwhile; ?>		
+		
+		<?php endif; ?>
+
+	</div> <!-- end #content -->
+
+<?php get_footer(); ?>
